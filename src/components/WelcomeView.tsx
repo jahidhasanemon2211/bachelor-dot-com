@@ -123,9 +123,14 @@ export default function WelcomeView() {
       {/* Top Header */}
       <div className="max-w-md mx-auto w-full flex justify-between items-center py-4">
         <div className="flex items-center gap-2">
-          <div className="w-10 h-10 rounded-2xl bg-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-indigo-100">
-            B
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="Bachelor dot com logo" 
+            className="w-10 h-10 rounded-full object-contain shadow-md"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=B&background=4f46e5&color=fff&rounded=true';
+            }}
+          />
           <div>
             <h1 className="text-base font-bold text-slate-800 tracking-tight leading-none">ব্যাচেলর ডট কম</h1>
             <span className="text-[10px] text-slate-400 font-mono tracking-widest uppercase">ম্যানেজার</span>
