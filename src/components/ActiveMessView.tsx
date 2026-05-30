@@ -93,11 +93,16 @@ export default function ActiveMessView() {
       {/* Sidebar for Desktop */}
       <aside className="w-64 bg-slate-900 text-slate-300 flex-col shrink-0 hidden md:flex h-screen sticky top-0 border-r border-slate-800 shadow-xl">
         <div className="p-6 flex items-center gap-3 text-white border-b border-white/5">
-          <div className="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center font-bold text-xl shadow-lg shadow-blue-500/20">
-            S
-          </div>
+          <img 
+            src="/logo.png" 
+            alt="Bachelor dot com logo" 
+            className="w-10 h-10 rounded-full object-contain shadow-lg shadow-blue-500/20 bg-white"
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=B&background=4f46e5&color=fff&rounded=true';
+            }}
+          />
           <div>
-            <span className="text-sm font-bold tracking-tight block leading-none text-white">ব্যাচেলর ডট কম</span>
+            <span className="text-sm font-bold tracking-tight block leading-none text-white w-full truncate">ব্যাচেলর ডট কম</span>
             <span className="text-[8px] text-blue-400 font-mono tracking-widest uppercase font-bold block mt-1">Professional</span>
           </div>
         </div>
@@ -150,9 +155,14 @@ export default function ActiveMessView() {
         {/* Mobile Header Navbar */}
         <header className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-md sticky top-0 z-40 border-b border-slate-100 dark:border-slate-700 py-3 shadow-xs flex md:hidden items-center justify-between px-4">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-xl bg-blue-600 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/10">
-              S
-            </div>
+            <img 
+              src="/logo.png" 
+              alt="Bachelor dot com logo" 
+              className="w-8 h-8 rounded-full object-contain shadow-md"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=B&background=4f46e5&color=fff&rounded=true';
+              }}
+            />
             <div>
               <h1 className="text-xs font-black text-slate-800 dark:text-white tracking-tight leading-none">ব্যাচেলর ডট কম</h1>
               <span className="text-[8px] text-blue-600 dark:text-blue-400 font-mono tracking-widest uppercase font-bold">Manager</span>
