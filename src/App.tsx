@@ -16,15 +16,8 @@ export default function App() {
   // 1. Loading Spinner
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center p-4">
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ repeat: Infinity, duration: 1.2, ease: 'linear' }}
-          className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-650 rounded-full mb-3"
-        />
-        <h3 className="text-xs font-bold font-mono tracking-wider text-slate-400 uppercase">
-          ব্যাচেলর ডট কম লোড হচ্ছে
-        </h3>
+      <div className="loader-container bg-slate-50">
+        <img src="/logo.png" alt="Bachelor Dot Com Logo" className="loader bg-white" />
       </div>
     );
   }
