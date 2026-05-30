@@ -97,7 +97,7 @@ export default function ActiveMessView() {
             S
           </div>
           <div>
-            <span className="text-sm font-bold tracking-tight block leading-none text-white">Smart Mess</span>
+            <span className="text-sm font-bold tracking-tight block leading-none text-white">ব্যাচেলর ডট কম</span>
             <span className="text-[8px] text-blue-400 font-mono tracking-widest uppercase font-bold block mt-1">Professional</span>
           </div>
         </div>
@@ -154,7 +154,7 @@ export default function ActiveMessView() {
               S
             </div>
             <div>
-              <h1 className="text-xs font-black text-slate-800 dark:text-white tracking-tight leading-none">Smart Mess</h1>
+              <h1 className="text-xs font-black text-slate-800 dark:text-white tracking-tight leading-none">ব্যাচেলর ডট কম</h1>
               <span className="text-[8px] text-blue-600 dark:text-blue-400 font-mono tracking-widest uppercase font-bold">Manager</span>
             </div>
           </div>
