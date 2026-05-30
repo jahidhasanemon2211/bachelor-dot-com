@@ -107,9 +107,12 @@ export default function AuthView() {
         {/* Banner */}
         <div className="text-center mb-6 space-y-2">
             <img 
-              src="https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?auto=format&fit=crop&q=80&w=800" 
+              src="/logo.png" 
               alt="Bachelor dot com living space" 
-              className="w-24 h-24 mx-auto rounded-3xl object-cover shadow-lg shadow-indigo-100"
+              className="w-24 h-24 mx-auto rounded-full object-contain shadow-lg shadow-indigo-100"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=B&background=4f46e5&color=fff&rounded=true&size=128';
+              }}
             />
             <h1 className="text-2xl font-black text-slate-800 tracking-tight leading-none mt-2">ব্যাচেলর ডট কম</h1>
             <p className="text-xs text-slate-500 font-medium">আপনার মেস পরিচালনার সম্পূর্ণ ডিজিটাল উপায়</p>
