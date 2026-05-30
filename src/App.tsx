@@ -23,7 +23,7 @@ export default function App() {
           className="w-12 h-12 border-4 border-indigo-200 border-t-indigo-650 rounded-full mb-3"
         />
         <h3 className="text-xs font-bold font-mono tracking-wider text-slate-400 uppercase">
-          স্মার্ট মেস ম্যানেজার লোড হচ্ছে
+          ব্যাচেলর ডট কম লোড হচ্ছে
         </h3>
       </div>
     );
