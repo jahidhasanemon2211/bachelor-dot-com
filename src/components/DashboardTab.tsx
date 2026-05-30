@@ -370,11 +370,11 @@ export default function DashboardTab() {
                 <span className="text-[10px] uppercase font-bold tracking-wider text-slate-400 block mb-1.5">আজকের মেন্যু</span>
                 <div className="grid grid-cols-2 gap-1.5 text-xs font-medium text-slate-600">
                   <div className="bg-slate-50 rounded-lg p-1.5 border border-slate-100">
-                    <span className="text-[9px] block text-slate-400 font-bold mb-0.5">সকাল</span>
-                    {todayMenu?.breakfast || '-'}
+                    <span className="text-[9px] block text-slate-400 font-bold mb-0.5">দুপুর</span>
+                    {todayMenu?.lunch || '-'}
                   </div>
                   <div className="bg-slate-50 rounded-lg p-1.5 border border-slate-100">
-                    <span className="text-[9px] block text-slate-400 font-bold mb-0.5">রাতের খাবার</span>
+                    <span className="text-[9px] block text-slate-400 font-bold mb-0.5">রাত</span>
                     {todayMenu?.dinner || '-'}
                   </div>
                 </div>
