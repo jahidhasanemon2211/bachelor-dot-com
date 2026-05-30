@@ -1,0 +1,209 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Primitive Global Helpers ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Mess Membership Validation Helpers ---
+    function isMember(messId) {
+      return exists(/databases/$(database)/documents/messes/$(messId)/members/$(request.auth.uid));
+    }
+
+    function getMember(messId) {
+      return get(/databases/$(database)/documents/messes/$(messId)/members/$(request.auth.uid)).data;
+    }
+
+    function isManager(messId) {
+      return isMember(messId) && getMember(messId).role == 'manager';
+    }
+
+    function isManagerOrAccountant(messId) {
+      return isMember(messId) && (getMember(messId).role == 'manager' || getMember(messId).role == 'accountant');
+    }
+
+    // --- Schema and Validation Guards ---
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'email', 'createdAt'])
+        && data.uid is string && data.uid.size() <= 128
+        && data.displayName is string && data.displayName.size() <= 100
+        && data.email is string && data.email.size() <= 150
+        && (data.messId is string || !data.keys().contains('messId'))
+        && (data.role is string || !data.keys().contains('role'))
+        && (data.status is string || !data.keys().contains('status'));
+    }
+
+    function isValidMess(data) {
+      return data.keys().hasAll(['messId', 'name', 'inviteCode', 'createdBy', 'createdAt'])
+        && data.messId is string && data.messId.size() <= 128
+        && data.name is string && data.name.size() >= 3 && data.name.size() <= 100
+        && data.inviteCode is string && data.inviteCode.size() >= 3 && data.inviteCode.size() <= 50
+        && data.createdBy is string && data.createdBy == request.auth.uid;
+    }
+
+    function isValidMember(data) {
+      return data.keys().hasAll(['uid', 'displayName', 'email', 'role', 'status', 'joinedAt'])
+        && data.uid is string && data.uid.size() <= 128
+        && data.displayName is string && data.displayName.size() <= 100
+        && data.email is string && data.email.size() <= 150
+        && data.role in ['manager', 'accountant', 'member']
+        && data.status in ['active', 'pending'];
+    }
+
+    function isValidMeal(data) {
+      return data.keys().hasAll(['mealId', 'userId', 'userName', 'date', 'breakfast', 'lunch', 'dinner', 'reqBreakfast', 'reqLunch', 'reqDinner', 'updatedAt'])
+        && data.mealId is string && data.mealId.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.userName is string && data.userName.size() <= 100
+        && data.date is string && data.date.size() == 10
+        && data.breakfast is number && data.breakfast >= 0 && data.breakfast <= 10
+        && data.lunch is number && data.lunch >= 0 && data.lunch <= 10
+        && data.dinner is number && data.dinner >= 0 && data.dinner <= 10
+        && data.reqBreakfast is number && data.reqBreakfast >= 0 && data.reqBreakfast <= 10
+        && data.reqLunch is number && data.reqLunch >= 0 && data.reqLunch <= 10
+        && data.reqDinner is number && data.reqDinner >= 0 && data.reqDinner <= 10;
+    }
+
+    function isValidExpense(data) {
+      return data.keys().hasAll(['expenseId', 'date', 'amount', 'shopperUid', 'shopperName', 'items', 'createdAt'])
+        && data.expenseId is string && data.expenseId.size() <= 128
+        && data.date is string && data.date.size() == 10
+        && data.amount is number && data.amount >= 0 && data.amount <= 100000
+        && data.shopperUid is string && data.shopperUid.size() <= 128
+        && data.shopperName is string && data.shopperName.size() <= 100
+        && data.items is string && data.items.size() <= 10000;
+    }
+
+    // Allow deposits validation
+    function isValidDeposit(data) {
+      return data.keys().hasAll(['depositId', 'userId', 'userName', 'amount', 'date', 'status', 'createdAt'])
+        && data.depositId is string && data.depositId.size() <= 128
+        && data.userId is string && data.userId.size() <= 128
+        && data.userName is string && data.userName.size() <= 100
+        && data.amount is number && data.amount >= 0 && data.amount <= 100000
+        && data.date is string && data.date.size() == 10
+        && data.status in ['pending', 'approved'];
+    }
+
+    function isValidSchedule(data) {
+      return data.keys().hasAll(['scheduleId', 'date', 'userId', 'userName'])
+        && data.scheduleId is string && data.scheduleId.size() <= 128
+        && data.date is string && data.date.size() == 10
+        && data.userId is string && data.userId.size() <= 128
+        && data.userName is string && data.userName.size() <= 100;
+    }
+
+    function isValidNotification(data) {
+      return data.keys().hasAll(['notificationId', 'title', 'message', 'type', 'createdAt'])
+        && data.notificationId is string && data.notificationId.size() <= 128
+        && data.title is string && data.title.size() <= 200
+        && data.message is string && data.message.size() <= 1000
+        && data.type is string && data.type.size() <= 50;
+    }
+
+
+    // --- Collection Routes ---
+
+    // 1. Users
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || (resource.data.messId != "" && isMember(resource.data.messId)));
+      allow list: if isSignedIn(); // queries filtered on messId on client side are safe
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidUser(incoming());
+      allow update: if isSignedIn() && (request.auth.uid == userId || (existing().messId != "" && isManager(existing().messId))) && isValidUser(incoming()) && incoming().createdAt == existing().createdAt;
+    }
+
+    // 2. Messes
+    match /messes/{messId} {
+      allow get: if isSignedIn() && (resource.data.createdBy == request.auth.uid || isMember(messId));
+      allow list: if isSignedIn(); // client joins or queries specific messes
+      allow create: if isSignedIn() && incoming().createdBy == request.auth.uid && isValidMess(incoming());
+      allow update: if isSignedIn() && isManager(messId) && isValidMess(incoming());
+      allow delete: if isSignedIn() && isManager(messId);
+    }
+
+    // 3. Mess Subcollections
+    match /messes/{messId}/members/{userId} {
+      allow read: if isSignedIn() && (request.auth.uid == userId || isMember(messId));
+      allow create: if isSignedIn() && request.auth.uid == userId && isValidMember(incoming());
+      allow update: if isSignedIn() && isMember(messId) && (request.auth.uid == userId || isManagerOrAccountant(messId)) && isValidMember(incoming());
+      allow delete: if isSignedIn() && (request.auth.uid == userId || isManager(messId));
+    }
+
+    // 4. Meals Subcollection
+    match /messes/{messId}/meals/{mealId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create: if isSignedIn() && isMember(messId) && (isManager(messId) || request.auth.uid == incoming().userId) && isValidMeal(incoming());
+      allow update: if isSignedIn() && isMember(messId) && (isManager(messId) || request.auth.uid == incoming().userId) && isValidMeal(incoming());
+      allow delete: if isSignedIn() && isMember(messId) && (isManager(messId) || request.auth.uid == existing().userId);
+    }
+
+    // 5. Expenses Subcollection
+    match /messes/{messId}/expenses/{expenseId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create: if isSignedIn() && isMember(messId) && (isManagerOrAccountant(messId) || request.auth.uid == incoming().shopperUid) && isValidExpense(incoming());
+      allow update: if isSignedIn() && isMember(messId) && (isManagerOrAccountant(messId) || request.auth.uid == existing().shopperUid) && isValidExpense(incoming());
+      allow delete: if isSignedIn() && isMember(messId) && (isManagerOrAccountant(messId) || request.auth.uid == existing().shopperUid);
+    }
+
+    // 6. Deposits Subcollection
+    match /messes/{messId}/deposits/{depositId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create: if isSignedIn() && isMember(messId) && request.auth.uid == incoming().userId && incoming().status == 'pending' && isValidDeposit(incoming());
+      allow update: if isSignedIn() && isMember(messId) && isManagerOrAccountant(messId) && isValidDeposit(incoming());
+      allow delete: if isSignedIn() && isMember(messId) && (isManagerOrAccountant(messId) || request.auth.uid == existing().userId);
+    }
+
+    // 7. Schedules Subcollection
+    match /messes/{messId}/schedules/{scheduleId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create, update: if isSignedIn() && isManagerOrAccountant(messId) && isValidSchedule(incoming());
+      allow delete: if isSignedIn() && isMember(messId) && (isManagerOrAccountant(messId) || request.auth.uid == existing().userId);
+    }
+
+    // 8. Notifications Subcollection
+    match /messes/{messId}/notifications/{notificationId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create: if isSignedIn() && isMember(messId) && isValidNotification(incoming());
+      allow delete: if isSignedIn() && isManager(messId);
+    }
+
+    // 9. Routines Subcollection
+    match /messes/{messId}/routines/{routineId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create, update, delete: if isSignedIn() && isManager(messId);
+    }
+
+    // 10. Complaints Subcollection
+    match /messes/{messId}/complaints/{complaintId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create: if isSignedIn() && isMember(messId) && incoming().userId == request.auth.uid;
+      allow update: if isSignedIn() && isMember(messId) && isManager(messId);
+      allow delete: if isSignedIn() && isMember(messId) && (isManager(messId) || resource.data.userId == request.auth.uid);
+    }
+
+    // 11. Shopper Funds Subcollection
+    match /messes/{messId}/shopperFunds/{fundId} {
+      allow read: if isSignedIn() && isMember(messId);
+      allow create, update, delete: if isSignedIn() && isManagerOrAccountant(messId);
+    }
+  }
+}

@@ -1,2 +1,20 @@
-# bachelor-dot-com
-মেসের মিল ট্র্যাকিং, ডেইলি বাজার, আর খিটখিটে ম্যানেজারের জগাখিচুড়ি হিসাবের দিন শেষ! Bachelor.com অ্যাপ বা ওয়েবসাইট দিয়ে এখন মেসের মিল, খরচ, আর বর্ডারদের হিসাব রাখুন এক ক্লিকে। নো ঝামেলা, পিওর ব্যাচেলর লাইফ!  
+<div align="center">
+<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
+</div>
+
+# Run and deploy your AI Studio app
+
+This contains everything you need to run your app locally.
+
+View your app in AI Studio: https://ai.studio/apps/c2ec7528-0897-449e-a91c-1462ec80e171
+
+## Run Locally
+
+**Prerequisites:**  Node.js
+
+
+1. Install dependencies:
+   `npm install`
+2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
+3. Run the app:
+   `npm run dev`

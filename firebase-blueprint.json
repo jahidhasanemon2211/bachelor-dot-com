@@ -1,0 +1,156 @@
+{
+  "entities": {
+    "User": {
+      "title": "User",
+      "description": "Base user registration record mapped to their Authentication UID.",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Unique user ID" },
+        "displayName": { "type": "string", "description": "User's full display name" },
+        "email": { "type": "string", "description": "User's email" },
+        "messId": { "type": "string", "description": "ID of the current mess, or empty string if not in one" },
+        "role": { "type": "string", "enum": ["manager", "member"], "description": "Role of the user if they belong to a mess" },
+        "status": { "type": "string", "enum": ["active", "pending", "none"], "description": "Membership request status" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["uid", "displayName", "email", "createdAt"]
+    },
+    "Mess": {
+      "title": "Mess",
+      "description": "Mess profile with custom config and active details",
+      "type": "object",
+      "properties": {
+        "messId": { "type": "string", "description": "Unique mess ID" },
+        "name": { "type": "string", "description": "Mess name" },
+        "inviteCode": { "type": "string", "description": "Code required for members to join" },
+        "createdBy": { "type": "string", "description": "UID of the mess manager" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Creation timestamp" }
+      },
+      "required": ["messId", "name", "inviteCode", "createdBy", "createdAt"]
+    },
+    "Member": {
+      "title": "Member",
+      "description": "A member document inside a mess, linking profile to mess membership",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string", "description": "Member's UID" },
+        "displayName": { "type": "string", "description": "Member's display name" },
+        "email": { "type": "string", "description": "Member's email" },
+        "role": { "type": "string", "enum": ["manager", "member"], "description": "Role inside this mess" },
+        "status": { "type": "string", "enum": ["active", "pending"], "description": "Status inside this mess" },
+        "joinedAt": { "type": "string", "format": "date-time", "description": "When they joined or requested" }
+      },
+      "required": ["uid", "displayName", "email", "role", "status", "joinedAt"]
+    },
+    "Meal": {
+      "title": "Meal",
+      "description": "Daily meal record for a member",
+      "type": "object",
+      "properties": {
+        "mealId": { "type": "string", "description": "Document ID composed of userId_date" },
+        "userId": { "type": "string", "description": "Member UID" },
+        "userName": { "type": "string", "description": "Member display name" },
+        "date": { "type": "string", "description": "Date formatted as YYYY-MM-DD" },
+        "breakfast": { "type": "number", "description": "Number of breakfasts eaten" },
+        "lunch": { "type": "number", "description": "Number of lunches eaten" },
+        "dinner": { "type": "number", "description": "Number of dinners eaten" },
+        "reqBreakfast": { "type": "number", "description": "Requested breakfasts for next day" },
+        "reqLunch": { "type": "number", "description": "Requested lunches for next day" },
+        "reqDinner": { "type": "number", "description": "Requested dinners for next day" },
+        "updatedAt": { "type": "string", "format": "date-time", "description": "Last updated" }
+      },
+      "required": ["mealId", "userId", "userName", "date", "breakfast", "lunch", "dinner", "reqBreakfast", "reqLunch", "reqDinner", "updatedAt"]
+    },
+    "Expense": {
+      "title": "Expense",
+      "description": "A daily marketing/outgoings expense item containing lines of items bought",
+      "type": "object",
+      "properties": {
+        "expenseId": { "type": "string", "description": "Unique expense ID" },
+        "date": { "type": "string", "description": "Date of billing YYYY-MM-DD" },
+        "amount": { "type": "number", "description": "Total amount spent" },
+        "description": { "type": "string", "description": "Optional notes/overview" },
+        "shopperUid": { "type": "string", "description": "Shopper UID" },
+        "shopperName": { "type": "string", "description": "Shopper's name" },
+        "items": { "type": "string", "description": "Serialized JSON text representing item segments, e.g. [{name, price}]" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Time of creation" }
+      },
+      "required": ["expenseId", "date", "amount", "shopperUid", "shopperName", "items", "createdAt"]
+    },
+    "Deposit": {
+      "title": "Deposit",
+      "description": "Contribution deposit tracking by a member to feed the marketing funds",
+      "type": "object",
+      "properties": {
+        "depositId": { "type": "string", "description": "Unique deposit tracker ID" },
+        "userId": { "type": "string", "description": "The depositing member" },
+        "userName": { "type": "string", "description": "Member identity" },
+        "amount": { "type": "number", "description": "Monetary sum in Taka / Tk" },
+        "date": { "type": "string", "description": "Payment date YYYY-MM-DD" },
+        "status": { "type": "string", "enum": ["pending", "approved"], "description": "Approved matches available funds directly" },
+        "approvedBy": { "type": "string", "description": "UID of the approving manager" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Added time" }
+      },
+      "required": ["depositId", "userId", "userName", "amount", "date", "status", "createdAt"]
+    },
+    "Schedule": {
+      "title": "Schedule",
+      "description": "Shopper scheduling date assigned to a specific member",
+      "type": "object",
+      "properties": {
+        "scheduleId": { "type": "string", "description": "Document ID matching YYYY-MM-DD" },
+        "date": { "type": "string", "description": "Target date YYYY-MM-DD" },
+        "userId": { "type": "string", "description": "UID of assigned shopper" },
+        "userName": { "type": "string", "description": "Assigned name" }
+      },
+      "required": ["scheduleId", "date", "userId", "userName"]
+    },
+    "Notification": {
+      "title": "Notification",
+      "description": "Instant broadcast log history",
+      "type": "object",
+      "properties": {
+        "notificationId": { "type": "string", "description": "Unique notification ID" },
+        "title": { "type": "string", "description": "Notification title text" },
+        "message": { "type": "string", "description": "Substance description" },
+        "type": { "type": "string", "description": "Source classification, e.g. expense, system, meal_request" },
+        "createdAt": { "type": "string", "format": "date-time", "description": "Broadcast timestamp" }
+      },
+      "required": ["notificationId", "title", "message", "type", "createdAt"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": "User",
+      "description": "Active profile reference for general users."
+    },
+    "/messes/{messId}": {
+      "schema": "Mess",
+      "description": "Active profile details for specific mess associations."
+    },
+    "/messes/{messId}/members/{userId}": {
+      "schema": "Member",
+      "description": "Members linked inside this specific mess."
+    },
+    "/messes/{messId}/meals/{mealId}": {
+      "schema": "Meal",
+      "description": "Daily food entries for each member."
+    },
+    "/messes/{messId}/expenses/{expenseId}": {
+      "schema": "Expense",
+      "description": "Daily shopping/marketing expenses for feeds."
+    },
+    "/messes/{messId}/deposits/{depositId}": {
+      "schema": "Deposit",
+      "description": "Cash/Taka payments from members."
+    },
+    "/messes/{messId}/schedules/{scheduleId}": {
+      "schema": "Schedule",
+      "description": "Schedule mapping dates to designated marketing shoppers."
+    },
+    "/messes/{messId}/notifications/{notificationId}": {
+      "schema": "Notification",
+      "description": "Notifications triggered live within the mess."
+    }
+  }
+}

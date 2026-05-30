@@ -1,0 +1,6 @@
+{
+  "name": "ব্যাচেলর ডট কম",
+  "description": "ব্যাচেলর ডট কম - A comprehensive, responsive Mess Management System to manage meals, daily marketing expenses, shopper dates, notifications, and balance calculations in real-time.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
